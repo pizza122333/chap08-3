@@ -7,33 +7,33 @@ using namespace std;
 int main() {
     Mat src = imread("lenna.bmp");
     if (src.empty()) {
-        cerr << "»çÁøÀ» Ã£À» ¼ö ¾ø¾î¿ä!" << endl;
+        cerr << "ì‚¬ì§„ì„ ì°¾ì„ ìˆ˜ ì—†ì–´ìš”!" << endl;
         return -1;
     }
 
     float W = src.cols;
     float H = src.rows;
 
-    // ¿ø·¡ »çÁøÀÇ ²ÀÁþÁ¡ 3°³
+    // ì›ëž˜ ì‚¬ì§„ì˜ ê¼­ì§“ì  3ê°œ
     Point2f srcPts[3] = { Point2f(0, 0), Point2f(W, 0), Point2f(0, H) };
 
-    // ÁÙ¾îµé°í Á¤Áß¾ÓÀ¸·Î ÀÌµ¿ÇÒ ²ÀÁþÁ¡ 3°³
+    // ì¤„ì–´ë“¤ê³  ì •ì¤‘ì•™ìœ¼ë¡œ ì´ë™í•  ê¼­ì§“ì  3ê°œ
     Point2f dstPts[3] = {
         Point2f(W / 4.0f, H / 4.0f),
         Point2f(3.0f * W / 4.0f, H / 4.0f),
         Point2f(W / 4.0f, 3.0f * H / 4.0f)
     };
 
-    // Áöµµ ¸¸µé°í º¯È¯ÇÏ±â
+    // ì§€ë„ ë§Œë“¤ê³  ë³€í™˜í•˜ê¸°
     Mat M = getAffineTransform(srcPts, dstPts);
     Mat dst;
     warpAffine(src, dst, M, src.size());
 
-    // È­¸é¿¡ º¸¿©ÁÖ±â
+    // í™”ë©´ì— ë³´ì—¬ì£¼ê¸°
     imshow("src", src);
     imshow("dst2", dst);
 
-    // ?? [¿¡·¯ ÇØ°á´Ü!] ÄÄÇ»ÅÍ°¡ ¸ØÃßÁö ¾Ê°í ¾Æ¹« Å°³ª ´©¸¦ ¶§±îÁö ¹«ÇÑÈ÷ ±â´Ù¸®°Ô ÇÕ´Ï´Ù.
+    // ?? [ì—ëŸ¬ í•´ê²°ë‹¨!] ì»´í“¨í„°ê°€ ë©ˆì¶”ì§€ ì•Šê³  ì•„ë¬´ í‚¤ë‚˜ ëˆ„ë¥¼ ë•Œê¹Œì§€ ë¬´í•œížˆ ê¸°ë‹¤ë¦¬ê²Œ í•©ë‹ˆë‹¤.
     waitKey(0);
 
     return 0;
