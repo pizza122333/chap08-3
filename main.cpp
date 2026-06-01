@@ -1,0 +1,56 @@
+#include "opencv2/opencv.hpp"
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main() {
+    // 0번 기본 카메라(웹캠)를 활성화합니다. 
+    // 캠이 없다면 동영상 파일 경로 "video.mp4" 등을 넣어도 됩니다.
+    VideoCapture cap(0);
+    if (!cap.isOpened()) {
+        cerr << "카메라를 열 수 없습니다!" << endl;
+        return -1;
+    }
+
+    Mat frame, dst;
+    int total_angle = 0; // 누적할 회전 각도 상자 (0, 90, 180, 270)
+
+    cout << "=== 실습과제 6 제어 방법 ===" << endl;
+    cout << "▶ r 키: 시계 방향으로 90도 회전" << endl;
+    cout << "▶ q 키: 프로그램 종료" << endl;
+
+    while (true) {
+        // 1. 카메라로부터 실시간 새 프레임(원본)을 읽어옵니다.
+        cap >> frame;
+        if (frame.empty()) break;
+
+        // 왜곡 방지를 위해 매 순간 들어오는 '생 원본 프레임'의 중심을 구합니다.
+        Point2f center = Point2f(frame.cols / 2.0f, frame.rows / 2.0f);
+
+        // 2. 누적된 총 각도(total_angle)로 어파인 변환 지도를 만듭니다.
+        Mat M = getRotationMatrix2D(center, total_angle, 1.0);
+        warpAffine(frame, dst, M, frame.size());
+
+        // 화면에 결과 비디오 출력
+        imshow("Camera Window", dst);
+
+        // ?? [조건 사수!] 반복문 내에서 waitKey는 딱 한 번만 실행합니다!
+        int key = waitKey(30);
+
+        // 3. 받아온 키값 하나로 모든 조건을 분기합니다.
+        if (key == 'r' || key == 'R') {
+            // r을 누르면 시계 방향으로 90도 회전 (오픈CV 공식상 시계방향은 마이너스)
+            total_angle -= 90;
+
+            // 각도가 무한히 커지거나 작아지는 걸 막기 위해 360도 주기로 회전 조절
+            if (total_angle <= -360) total_angle = 0;
+        }
+        else if (key == 'q' || key == 'Q' || key == 27) {
+            // q나 ESC를 누르면 종료
+            break;
+        }
+    }
+
+    return 0;
+}
