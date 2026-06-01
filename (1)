@@ -1,0 +1,32 @@
+#include "opencv2/opencv.hpp"
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main() {
+    // 1. 원본 사진(src)을 불러와요
+    Mat src = imread("lenna.bmp");
+    if (src.empty()) {
+        cerr << "사진을 찾을 수 없어요!" << endl;
+        return -1;
+    }
+
+    // 2. 회전의 중심이 될 '원본 사진의 정중앙 점'을 구해요
+    Point2f center = Point2f(src.cols / 2.0f, src.rows / 2.0f);
+
+    // 3. 시계 방향으로 45도(-45), 크기는 2배(2)로 만드는 "회전+확대 지도(M)"를 만듭니다
+    Mat M = getRotationMatrix2D(center, -45, 2);
+
+    // 4. 지도를 가지고 실제로 사진을 변환해요
+    Mat dst;
+    // 결과창의 크기도 원본보다 2배 커져야 사진이 잘리지 않고 넓게 담겨요!
+    warpAffine(src, dst, M, src.size() * 2);
+
+    // 5. 원본과 결과를 화면에 보여줍니다
+    imshow("src", src);
+    imshow("dst", dst);
+    waitKey();
+
+    return 0;
+}
