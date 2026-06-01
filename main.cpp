@@ -1,0 +1,56 @@
+#include "opencv2/opencv.hpp"
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main() {
+    // 1. 원본 사진을 안전하게 불러옵니다
+    Mat src = imread("lenna.bmp");
+    if (src.empty()) {
+        cerr << "Image load failed!" << endl;
+        return -1;
+    }
+    imshow("src", src);
+
+    Mat dst;
+    int flipCode[] = { 1, 0, -1 }; // 1: 좌우, 0: 상하, -1: 상하좌우
+
+    float W = src.cols; // 영상의 가로 크기
+    float H = src.rows; // 영상의 세로 크기
+
+    // 2. 예제와 똑같이 3번 반복하며 대칭 이동을 수행합니다
+    for (int i = 0; i < 3; i++) {
+        Mat M; // 어파인 변환 행렬을 담을 상자
+
+        // flipCode 값에 따라 알맞은 대칭 행렬 M을 만들어 줍니다
+        if (flipCode[i] == 1) {
+            // 좌우 대칭 행렬
+            M = (Mat_<double>(2, 3) << -1, 0, W,
+                0, 1, 0);
+        }
+        else if (flipCode[i] == 0) {
+            // 상하 대칭 행렬
+            M = (Mat_<double>(2, 3) << 1, 0, 0,
+                0, -1, H);
+        }
+        else if (flipCode[i] == -1) {
+            // 상하좌우 대칭 행렬
+            M = (Mat_<double>(2, 3) << -1, 0, W,
+                0, -1, H);
+        }
+
+        // [핵심 변경점] flip 대신 warpAffine 함수를 사용하여 대칭 변환 수행!
+        warpAffine(src, dst, M, src.size());
+
+        // 예제 코드와 동일하게 어떤 모드인지 텍스트를 화면에 그려줍니다
+        String desc = format("flipCode: %d (warpAffine)", flipCode[i]);
+        putText(dst, desc, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1.0,
+            Scalar(255, 0, 0), 1, LINE_AA);
+
+        imshow("dst", dst);
+        waitKey(); // 아무 키나 누를 때마다 다음 대칭 결과로 넘어갑니다
+    }
+
+    return 0;
+}
